@@ -5,137 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Intake Form</title>
     <style>
+        /* Basic styles */
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
+            max-width: 600px;
             margin: auto;
             padding: 20px;
             background-color: #f4f7f8;
         }
         h2 {
             color: #333;
-            margin-top: 20px;
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 4px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
         }
         .form-section {
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .form-page {
             display: none;
         }
-        .form-page.active {
+        .form-section.active {
             display: block;
         }
-        .submit-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border: none;
+        .security-badge {
+            background-color: #e8f5e9;
             border-radius: 4px;
-            cursor: pointer;
+            padding: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .submit-button:hover {
-            background-color: #45a049;
+        .progress-container {
+            margin-top: 10px;
+            width: 100%;
+            background-color: #d3d3d3;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #4caf50;
+            transition: width 0.3s;
+        }
+        .toggle-fields {
+            display: none;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <!-- HIPAA Compliance Notice -->
+    <!-- Security notice -->
     <div class="security-badge">
         <span>This form is HIPAA compliant and securely encrypted</span>
     </div>
 
-    <!-- Form with Pages -->
-    <form id="intakeForm" onsubmit="submitForm(event)" novalidate>
-        <!-- Page 1: Allergies & Medical History -->
-        <div class="form-page active" id="page-1">
+    <!-- Progress bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <form id="intakeForm" onsubmit="submitForm(event)">
+        <!-- Page 1: Allergies -->
+        <div class="form-section active" id="page-1">
             <h2>Allergies & Medical History</h2>
-            <!-- Medication Allergy -->
+
             <label>Do you have any medication allergies?
-                <select name="medicationAllergy" onchange="toggleAllergyFields('medication', this.value)">
+                <select onchange="toggleFields('medicationAllergyFields', this.value)">
                     <option value="">Select</option>
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                 </select>
             </label>
-            <div id="medicationAllergyFields" style="display: none;">
-                <label>Medication Name:<input type="text" name="medicationAllergyName"></label>
-                <label>Reaction:<input type="text" name="medicationReaction"></label>
-                <button type="button" onclick="addField('medicationAllergyFields')">Add Another Medication</button>
+            <div class="toggle-fields" id="medicationAllergyFields">
+                <label>Medication Name: <input type="text" name="medicationAllergyName"></label>
+                <label>Reaction: <input type="text" name="medicationReaction"></label>
             </div>
-            <button type="button" onclick="nextPage()">Next</button>
-        </div>
 
-        <!-- Page 2: Emergency Contact -->
-        <div class="form-page" id="page-2">
-            <h2>Emergency Contact Information</h2>
-            <label>Name:<input type="text" name="emergencyName" required></label>
-            <label>Relationship:<input type="text" name="emergencyRelationship" required></label>
-            <label>Phone:<input type="tel" name="emergencyPhone" required></label>
-            <button type="button" onclick="nextPage()">Next</button>
-        </div>
-
-        <!-- Page 3: Consent and Signature -->
-        <div class="form-page" id="page-3">
-            <h2>Consent and Signature</h2>
-            <label>Signature:<input type="text" name="signature" required></label>
-            <p>Date: <span id="timestamp"></span></p>
-            <button type="submit" class="submit-button">Submit Form</button>
-        </div>
-    </form>
-</div>
-
-<script>
-    let currentPage = 0;
-    const pages = document.querySelectorAll('.form-page');
-
-    function nextPage() {
-        if (currentPage < pages.length - 1) {
-            pages[currentPage].classList.remove('active');
-            currentPage++;
-            pages[currentPage].classList.add('active');
-            updateProgress();
-        }
-    }
-
-    function updateProgress() {
-        const progress = ((currentPage + 1) / pages.length) * 100;
-        document.getElementById('progress').style.width = progress + '%';
-    }
-
-    function toggleAllergyFields(type, value) {
-        document.getElementById(type + 'AllergyFields').style.display = value === 'Yes' ? 'block' : 'none';
-    }
-
-    function addField(containerId) {
-        const container = document.getElementById(containerId);
-        const newField = container.firstElementChild.cloneNode(true);
-        newField.querySelectorAll('input').forEach(input => input.value = '');
-        container.appendChild(newField);
-    }
-
-    function submitForm(event) {
-        event.preventDefault();
-        alert("Form submitted successfully!");
-    }
-
-    document.getElementById('timestamp').textContent = new Date().toLocaleDateString();
-</script>
-
-</body>
-</html>
+            <label>Do you have any food allergies?
+                <select onchange="toggleFields('foodAllergyFields', this.value)">
+                    <option value="">Select</option>
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </label>
+            <div class="toggle-fields" id="foodAllergyFields">
+                <label>Food Name: <input type="text" name="foodAllergyName"></label>
