@@ -3,145 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Registration Form</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            background-color: #f4f7f8;
-        }
-        h1, h2 {
-            text-align: center;
-            color: #333;
-        }
-        label {
-            font-weight: bold;
-        }
-        input[type="text"], input[type="date"], input[type="email"], input[type="tel"], select, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 6px;
-            margin-bottom: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        input[type="checkbox"], input[type="radio"] {
-            margin-right: 10px;
-        }
-        .form-section {
-            background: #ffffff;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-row {
-            display: flex;
-            justify-content: space-between;
-        }
-        .form-row div {
-            flex: 1;
-            padding: 0 10px;
-        }
-        .form-row div:first-child {
-            padding-left: 0;
-        }
-        .form-row div:last-child {
-            padding-right: 0;
-        }
-        .submit-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 18px;
-        }
-        .submit-button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <title>New Patient Intake Form</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to external CSS -->
+    <script src="scripts.js" defer></script> <!-- Link to external JS -->
 </head>
 <body>
+    <div class="form-container">
+        <!-- Progress Bar -->
+        <div id="progressBar">
+            <div id="progress" style="width: 0%;">0%</div>
+        </div>
 
-    <h1>Obesity Practice Patient Registration Form</h1>
+        <form id="patientForm" onsubmit="submitForm(event)">
 
-    <form>
-        <!-- Patient Demographics Section -->
-        <div class="form-section">
-            <h2>Patient Demographics</h2>
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name">
-
-            <label for="dob">Date of Birth</label>
-            <input type="date" id="dob" name="dob">
-
-            <div class="form-row">
-                <div>
-                    <label for="address">Mailing Address</label>
-                    <input type="text" id="address" name="address">
-                </div>
-                <div>
-                    <label for="gender">Gender</label>
-                    <select id="gender" name="gender">
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
+            <!-- Page 1: Patient Demographics -->
+            <div class="form-page" id="page-1">
+                <h2>Patient Demographics</h2>
+                <label>Full Name:<input type="text" name="fullName" required></label>
+                <label>Date of Birth:<input type="date" name="dob" required></label>
+                <label>Address:<input type="text" name="address" required></label>
+                <label>Gender:
+                    <select name="gender" required>
+                        <option value="">Select</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
                     </select>
-                </div>
+                </label>
+                <label>Phone Number:<input type="tel" name="phone" required></label>
+                <label>Email Address:<input type="email" name="email" required></label>
+                <button type="button" onclick="nextPage()">Next</button>
             </div>
 
-            <label for="email">Email Address</label>
-            <input type="email" id="email" name="email">
-        </div>
+            <!-- Page 2: Preferred Pharmacy -->
+            <div class="form-page" id="page-2">
+                <h2>Preferred Pharmacy</h2>
+                <label>Pharmacy Name:<input type="text" name="pharmacy" list="pharmacyList" required></label>
+                <datalist id="pharmacyList"></datalist> <!-- Use a JavaScript library for auto-fill -->
+                <label>Pharmacy Phone Number:<input type="tel" name="pharmacyPhone" required></label>
+                <button type="button" onclick="nextPage()">Next</button>
+            </div>
 
-        <!-- Insurance Information Section -->
-        <div class="form-section">
-            <h2>Insurance Information</h2>
-            <label for="insurance-plan">Insurance Plan</label>
-            <input type="text" id="insurance-plan" name="insurance-plan">
+            <!-- Page 3: Allergies -->
+            <div class="form-page" id="page-3">
+                <h2>Allergies</h2>
+                <label>Do you have any allergies?
+                    <select name="allergies" onchange="toggleAllergyFields(this.value)">
+                        <option value="">Select</option>
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </label>
+                <div id="allergyFields" style="display: none;">
+                    <label>Allergy Name:<input type="text" name="allergyName[]"></label>
+                    <label>Reaction:<input type="text" name="reaction[]"></label>
+                    <button type="button" onclick="addField('allergyFields')">Add More</button>
+                </div>
+                <button type="button" onclick="nextPage()">Next</button>
+            </div>
 
-            <label for="member-id">Member ID</label>
-            <input type="text" id="member-id" name="member-id">
-        </div>
+            <!-- Page 4: Medications -->
+            <div class="form-page" id="page-4">
+                <h2>Medications</h2>
+                <label>Are you currently taking any medications?
+                    <select name="takingMeds" onchange="toggleMedFields(this.value)">
+                        <option value="">Select</option>
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </label>
+                <div id="medFields" style="display: none;">
+                    <label>Medication Name:<input type="text" name="medName[]"></label>
+                    <label>Dosage:<input type="text" name="dosage[]"></label>
+                    <label>Frequency:<input type="text" name="frequency[]"></label>
+                    <button type="button" onclick="addField('medFields')">Add More</button>
+                </div>
+                <button type="button" onclick="nextPage()">Next</button>
+            </div>
 
-        <!-- Emergency Contact Section -->
-        <div class="form-section">
-            <h2>Emergency Contact</h2>
-            <label for="emergency-name">Name</label>
-            <input type="text" id="emergency-name" name="emergency-name">
+            <!-- Page 5: Lifestyle History -->
+            <div class="form-page" id="page-5">
+                <h2>Smoking, Alcohol, Recreational Drugs</h2>
+                <label>Smoking Status:
+                    <select name="smokingStatus" required>
+                        <option value="">Select</option>
+                        <option value="Never">Never</option>
+                        <option value="Current">Current</option>
+                        <option value="Former">Former</option>
+                    </select>
+                </label>
+                <label>Alcohol Use:
+                    <select name="alcoholUse" required>
+                        <option value="">Select</option>
+                        <option value="Never">Never</option>
+                        <option value="Occasionally">Occasionally</option>
+                        <option value="Daily">Daily</option>
+                    </select>
+                </label>
+                <label>Recreational Drugs:
+                    <select name="recDrugs" required>
+                        <option value="">Select</option>
+                        <option value="Never">Never</option>
+                        <option value="Past">Past</option>
+                        <option value="Current">Current</option>
+                    </select>
+                </label>
+                <button type="button" onclick="nextPage()">Next</button>
+            </div>
 
-            <label for="emergency-phone">Phone Number</label>
-            <input type="tel" id="emergency-phone" name="emergency-phone">
-        </div>
+            <!-- Other Pages as per previous structure -->
 
-        <!-- Medical History Section -->
-        <div class="form-section">
-            <h2>Medical History</h2>
-            <label for="allergies">Allergies</label>
-            <textarea id="allergies" name="allergies" rows="3"></textarea>
+            <!-- Final Page: Signature and Submit -->
+            <div class="form-page" id="page-final">
+                <h2>Consent and Signature</h2>
+                <label>Signature:
+                    <input type="text" name="signature" required placeholder="Type your name">
+                </label>
+                <p>Date: <span id="timestamp"></span></p>
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
 
-            <label for="medications">Current Medications</label>
-            <textarea id="medications" name="medications" rows="3"></textarea>
-        </div>
+    <script>
+        let currentPage = 0;
+        const pages = document.querySelectorAll('.form-page');
+        const progress = document.getElementById('progress');
 
-        <!-- Social History Section -->
-        <div class="form-section">
-            <h2>Social History</h2>
-            <label>Do you currently smoke?</label>
-            <input type="radio" id="smoke-yes" name="smoke" value="yes">
-            <label for="smoke-yes">Yes</label>
-            <input type="radio" id="smoke-no" name="smoke" value="no">
-            <label for="smoke-no">No</label>
-        </div>
+        // Progress function
+        function updateProgress() {
+            let progressValue = ((currentPage + 1) / pages.length) * 100;
+            progress.style.width = progressValue + '%';
+            progress.textContent = Math.round(progressValue) + '%';
+        }
 
-        <button type="submit" class="submit-button">Submit</button>
-    </form>
+        // Move to the next page
+        function nextPage() {
+            pages[currentPage].style.display = 'none';
+            currentPage++;
+            pages[currentPage].style.display = 'block';
+            updateProgress();
+        }
 
+        // Toggle Allergy and Med fields
+        function toggleAllergyFields(value) {
+            document.getElementById('allergyFields').style.display = value === 'Yes' ? 'block' : 'none';
+        }
+
+        function toggleMedFields(value) {
+            document.getElementById('medFields').style.display = value === 'Yes' ? 'block' : 'none';
+        }
+
+        // Add more fields function
+        function addField(containerId) {
+            const container = document.getElementById(containerId);
+            const newField = container.firstElementChild.cloneNode(true);
+            container.appendChild(newField);
+        }
+
+        // Set Timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+
+        // Submit form to Google Sheet (Use a backend API in production for HIPAA compliance)
+        function submitForm(event) {
+            event.preventDefault();
+            alert('Form Submitted!'); // Replace with form submission logic
+        }
+
+        // Initial load
+        pages.forEach((page, index) => {
+            if (index !== 0) page.style.display = 'none';
+        });
+        updateProgress();
+    </script>
 </body>
 </html>
