@@ -39,6 +39,20 @@
         .form-page.active {
             display: block;
         }
+        #progressBar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        #progress {
+            height: 10px;
+            background-color: #4caf50;
+            border-radius: 5px;
+            width: 0%;
+            text-align: center;
+            color: white;
+        }
         .autocomplete-suggestions {
             border: 1px solid #ccc;
             max-height: 150px;
@@ -54,96 +68,143 @@
     </style>
 </head>
 <body>
-
-<div class="form-container">
-    <form id="intakeForm" onsubmit="submitForm(event)">
-        <!-- Allergy Section -->
-        <div class="form-section" id="allergy-section">
-            <h2>Allergies</h2>
-            
-            <!-- Medication Allergy -->
-            <label>Do you have any medication allergies?
-                <select name="medicationAllergy" onchange="toggleAllergyFields('medication', this.value)">
-                    <option value="">Select</option>
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                </select>
-            </label>
-            <div id="medicationAllergyFields" style="display: none;">
-                <label>Medication Name:
-                    <input type="text" name="medicationAllergyName" oninput="autocomplete(this, medicationList)">
-                </label>
-                <label>Reaction: <input type="text" name="medicationReaction"></label>
-                <div class="autocomplete-suggestions" id="medicationSuggestions"></div>
-            </div>
-
-            <!-- Food Allergy -->
-            <label>Do you have any food allergies?
-                <select name="foodAllergy" onchange="toggleAllergyFields('food', this.value)">
-                    <option value="">Select</option>
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                </select>
-            </label>
-            <div id="foodAllergyFields" style="display: none;">
-                <label>Food Name:
-                    <input type="text" name="foodAllergyName" oninput="autocomplete(this, foodList)">
-                </label>
-                <label>Reaction: <input type="text" name="foodReaction"></label>
-                <div class="autocomplete-suggestions" id="foodSuggestions"></div>
-            </div>
-
-            <!-- Environmental Allergy -->
-            <label>Do you have any environmental allergies?
-                <select name="environmentalAllergy" onchange="toggleAllergyFields('environmental', this.value)">
-                    <option value="">Select</option>
-                    <option value="No">No</option>
-                    <option value="Yes">Yes</option>
-                </select>
-            </label>
-            <div id="environmentalAllergyFields" style="display: none;">
-                <label>Environmental Factor:
-                    <input type="text" name="environmentalAllergyName" oninput="autocomplete(this, environmentalList)">
-                </label>
-                <label>Reaction: <input type="text" name="environmentalReaction"></label>
-                <div class="autocomplete-suggestions" id="environmentalSuggestions"></div>
-            </div>
+    <div class="form-container">
+        <!-- Progress Bar -->
+        <div id="progressBar">
+            <div id="progress">0%</div>
         </div>
-    </form>
-</div>
 
-<script>
-    // Sample lists of common items for auto-suggestion
-    const medicationList = ["Aspirin", "Ibuprofen", "Penicillin", "Amoxicillin", "Codeine"];
-    const foodList = ["Peanuts", "Shellfish", "Milk", "Eggs", "Soy"];
-    const environmentalList = ["Pollen", "Dust", "Mold", "Pet Dander", "Smoke"];
+        <form id="intakeForm" onsubmit="submitForm(event)">
+            <!-- Allergy Section -->
+            <div class="form-section" id="allergy-section">
+                <h2>Allergies</h2>
 
-    // Toggle Allergy Fields based on Yes/No response
-    function toggleAllergyFields(type, value) {
-        document.getElementById(type + 'AllergyFields').style.display = value === 'Yes' ? 'block' : 'none';
-    }
+                <!-- Medication Allergy -->
+                <label>Do you have any medication allergies?
+                    <select name="medicationAllergy" onchange="toggleAllergyFields('medication', this.value)">
+                        <option value="">Select</option>
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </label>
+                <div id="medicationAllergyFields" style="display: none;">
+                    <label>Medication Name:
+                        <input type="text" name="medicationAllergyName" oninput="autocomplete(this, medicationList)">
+                    </label>
+                    <label>Reaction: <input type="text" name="medicationReaction"></label>
+                    <div class="autocomplete-suggestions" id="medicationSuggestions"></div>
+                </div>
 
-    // Autocomplete function
-    function autocomplete(input, list) {
-        const suggestionsDiv = document.getElementById(input.name + 'Suggestions');
-        suggestionsDiv.innerHTML = ''; // Clear previous suggestions
-        const inputValue = input.value.toLowerCase();
-        
-        if (inputValue.length === 0) return;
+                <!-- Food Allergy -->
+                <label>Do you have any food allergies?
+                    <select name="foodAllergy" onchange="toggleAllergyFields('food', this.value)">
+                        <option value="">Select</option>
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </label>
+                <div id="foodAllergyFields" style="display: none;">
+                    <label>Food Name:
+                        <input type="text" name="foodAllergyName" oninput="autocomplete(this, foodList)">
+                    </label>
+                    <label>Reaction: <input type="text" name="foodReaction"></label>
+                    <div class="autocomplete-suggestions" id="foodSuggestions"></div>
+                </div>
 
-        // Filter and display matching suggestions
-        const filteredSuggestions = list.filter(item => item.toLowerCase().startsWith(inputValue));
-        filteredSuggestions.forEach(suggestion => {
-            const suggestionDiv = document.createElement('div');
-            suggestionDiv.textContent = suggestion;
-            suggestionDiv.onclick = () => {
-                input.value = suggestion; // Set the input value to the clicked suggestion
-                suggestionsDiv.innerHTML = ''; // Clear suggestions
-            };
-            suggestionsDiv.appendChild(suggestionDiv);
+                <!-- Environmental Allergy -->
+                <label>Do you have any environmental allergies?
+                    <select name="environmentalAllergy" onchange="toggleAllergyFields('environmental', this.value)">
+                        <option value="">Select</option>
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </label>
+                <div id="environmentalAllergyFields" style="display: none;">
+                    <label>Environmental Factor:
+                        <input type="text" name="environmentalAllergyName" oninput="autocomplete(this, environmentalList)">
+                    </label>
+                    <label>Reaction: <input type="text" name="environmentalReaction"></label>
+                    <div class="autocomplete-suggestions" id="environmentalSuggestions"></div>
+                </div>
+            </div>
+
+            <!-- Final Page: Signature and Submit -->
+            <div class="form-page active" id="page-final">
+                <h2>Consent and Signature</h2>
+                <label>Signature:
+                    <input type="text" name="signature" required placeholder="Type your name">
+                </label>
+                <p>Date: <span id="timestamp"></span></p>
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Sample lists of common items for auto-suggestion
+        const medicationList = ["Aspirin", "Ibuprofen", "Penicillin", "Amoxicillin", "Codeine"];
+        const foodList = ["Peanuts", "Shellfish", "Milk", "Eggs", "Soy"];
+        const environmentalList = ["Pollen", "Dust", "Mold", "Pet Dander", "Smoke"];
+
+        // Toggle Allergy Fields based on Yes/No response
+        function toggleAllergyFields(type, value) {
+            document.getElementById(type + 'AllergyFields').style.display = value === 'Yes' ? 'block' : 'none';
+        }
+
+        // Autocomplete function
+        function autocomplete(input, list) {
+            const suggestionsDiv = document.getElementById(input.name + 'Suggestions');
+            suggestionsDiv.innerHTML = ''; // Clear previous suggestions
+            const inputValue = input.value.toLowerCase();
+            if (inputValue.length === 0) return;
+
+            // Filter and display matching suggestions
+            const filteredSuggestions = list.filter(item => item.toLowerCase().startsWith(inputValue));
+            filteredSuggestions.forEach(suggestion => {
+                const suggestionDiv = document.createElement('div');
+                suggestionDiv.textContent = suggestion;
+                suggestionDiv.onclick = () => {
+                    input.value = suggestion; // Set the input value to the clicked suggestion
+                    suggestionsDiv.innerHTML = ''; // Clear suggestions
+                };
+                suggestionsDiv.appendChild(suggestionDiv);
+            });
+        }
+
+        // Submit Form Function
+        function submitForm(event) {
+            event.preventDefault();
+            alert('Form Submitted!'); // Placeholder for actual submission logic
+        }
+
+        // Initialize pages on load (hide all except the first)
+        const pages = document.querySelectorAll('.form-page');
+        pages.forEach((page, index) => {
+            if (index !== 0) page.style.display = 'none';
         });
-    }
-</script>
 
+        // Set Timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+
+        // Progress function
+        function updateProgress() {
+            const progress = document.getElementById('progress');
+            let progressValue = ((currentPage + 1) / pages.length) * 100;
+            progress.style.width = progressValue + '%';
+            progress.textContent = Math.round(progressValue) + '%';
+        }
+
+        // Move to the next page
+        let currentPage = 0;
+        function nextPage() {
+            pages[currentPage].style.display = 'none';
+            currentPage++;
+            pages[currentPage].style.display = 'block';
+            updateProgress();
+        }
+
+        // Update progress on load
+        updateProgress();
+    </script>
 </body>
 </html>
