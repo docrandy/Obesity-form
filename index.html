@@ -3,178 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Patient Intake Form</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to external CSS -->
-    <script src="scripts.js" defer></script> <!-- Link to external JS -->
+    <title>Patient Intake Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f4f7f8;
+        }
+        h2 {
+            color: #333;
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-section {
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .form-page {
+            display: none;
+        }
+        .form-page.active {
+            display: block;
+        }
+        .autocomplete-suggestions {
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .autocomplete-suggestions div {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .autocomplete-suggestions div:hover {
+            background-color: #e9e9e9;
+        }
+    </style>
 </head>
 <body>
-    <div class="form-container">
-        <!-- Progress Bar -->
-        <div id="progressBar">
-            <div id="progress" style="width: 0%;">0%</div>
+
+<div class="form-container">
+    <form id="intakeForm" onsubmit="submitForm(event)">
+        <!-- Allergy Section -->
+        <div class="form-section" id="allergy-section">
+            <h2>Allergies</h2>
+            
+            <!-- Medication Allergy -->
+            <label>Do you have any medication allergies?
+                <select name="medicationAllergy" onchange="toggleAllergyFields('medication', this.value)">
+                    <option value="">Select</option>
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </label>
+            <div id="medicationAllergyFields" style="display: none;">
+                <label>Medication Name:
+                    <input type="text" name="medicationAllergyName" oninput="autocomplete(this, medicationList)">
+                </label>
+                <label>Reaction: <input type="text" name="medicationReaction"></label>
+                <div class="autocomplete-suggestions" id="medicationSuggestions"></div>
+            </div>
+
+            <!-- Food Allergy -->
+            <label>Do you have any food allergies?
+                <select name="foodAllergy" onchange="toggleAllergyFields('food', this.value)">
+                    <option value="">Select</option>
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </label>
+            <div id="foodAllergyFields" style="display: none;">
+                <label>Food Name:
+                    <input type="text" name="foodAllergyName" oninput="autocomplete(this, foodList)">
+                </label>
+                <label>Reaction: <input type="text" name="foodReaction"></label>
+                <div class="autocomplete-suggestions" id="foodSuggestions"></div>
+            </div>
+
+            <!-- Environmental Allergy -->
+            <label>Do you have any environmental allergies?
+                <select name="environmentalAllergy" onchange="toggleAllergyFields('environmental', this.value)">
+                    <option value="">Select</option>
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </label>
+            <div id="environmentalAllergyFields" style="display: none;">
+                <label>Environmental Factor:
+                    <input type="text" name="environmentalAllergyName" oninput="autocomplete(this, environmentalList)">
+                </label>
+                <label>Reaction: <input type="text" name="environmentalReaction"></label>
+                <div class="autocomplete-suggestions" id="environmentalSuggestions"></div>
+            </div>
         </div>
+    </form>
+</div>
 
-        <form id="patientForm" onsubmit="submitForm(event)">
+<script>
+    // Sample lists of common items for auto-suggestion
+    const medicationList = ["Aspirin", "Ibuprofen", "Penicillin", "Amoxicillin", "Codeine"];
+    const foodList = ["Peanuts", "Shellfish", "Milk", "Eggs", "Soy"];
+    const environmentalList = ["Pollen", "Dust", "Mold", "Pet Dander", "Smoke"];
 
-            <!-- Page 1: Patient Demographics -->
-            <div class="form-page" id="page-1">
-                <h2>Patient Demographics</h2>
-                <label>Full Name:<input type="text" name="fullName" required></label>
-                <label>Date of Birth:<input type="date" name="dob" required></label>
-                <label>Address:<input type="text" name="address" required></label>
-                <label>Gender:
-                    <select name="gender" required>
-                        <option value="">Select</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </label>
-                <label>Phone Number:<input type="tel" name="phone" required></label>
-                <label>Email Address:<input type="email" name="email" required></label>
-                <button type="button" onclick="nextPage()">Next</button>
-            </div>
+    // Toggle Allergy Fields based on Yes/No response
+    function toggleAllergyFields(type, value) {
+        document.getElementById(type + 'AllergyFields').style.display = value === 'Yes' ? 'block' : 'none';
+    }
 
-            <!-- Page 2: Preferred Pharmacy -->
-            <div class="form-page" id="page-2">
-                <h2>Preferred Pharmacy</h2>
-                <label>Pharmacy Name:<input type="text" name="pharmacy" list="pharmacyList" required></label>
-                <datalist id="pharmacyList"></datalist> <!-- Use a JavaScript library for auto-fill -->
-                <label>Pharmacy Phone Number:<input type="tel" name="pharmacyPhone" required></label>
-                <button type="button" onclick="nextPage()">Next</button>
-            </div>
+    // Autocomplete function
+    function autocomplete(input, list) {
+        const suggestionsDiv = document.getElementById(input.name + 'Suggestions');
+        suggestionsDiv.innerHTML = ''; // Clear previous suggestions
+        const inputValue = input.value.toLowerCase();
+        
+        if (inputValue.length === 0) return;
 
-            <!-- Page 3: Allergies -->
-            <div class="form-page" id="page-3">
-                <h2>Allergies</h2>
-                <label>Do you have any allergies?
-                    <select name="allergies" onchange="toggleAllergyFields(this.value)">
-                        <option value="">Select</option>
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                    </select>
-                </label>
-                <div id="allergyFields" style="display: none;">
-                    <label>Allergy Name:<input type="text" name="allergyName[]"></label>
-                    <label>Reaction:<input type="text" name="reaction[]"></label>
-                    <button type="button" onclick="addField('allergyFields')">Add More</button>
-                </div>
-                <button type="button" onclick="nextPage()">Next</button>
-            </div>
-
-            <!-- Page 4: Medications -->
-            <div class="form-page" id="page-4">
-                <h2>Medications</h2>
-                <label>Are you currently taking any medications?
-                    <select name="takingMeds" onchange="toggleMedFields(this.value)">
-                        <option value="">Select</option>
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                    </select>
-                </label>
-                <div id="medFields" style="display: none;">
-                    <label>Medication Name:<input type="text" name="medName[]"></label>
-                    <label>Dosage:<input type="text" name="dosage[]"></label>
-                    <label>Frequency:<input type="text" name="frequency[]"></label>
-                    <button type="button" onclick="addField('medFields')">Add More</button>
-                </div>
-                <button type="button" onclick="nextPage()">Next</button>
-            </div>
-
-            <!-- Page 5: Lifestyle History -->
-            <div class="form-page" id="page-5">
-                <h2>Smoking, Alcohol, Recreational Drugs</h2>
-                <label>Smoking Status:
-                    <select name="smokingStatus" required>
-                        <option value="">Select</option>
-                        <option value="Never">Never</option>
-                        <option value="Current">Current</option>
-                        <option value="Former">Former</option>
-                    </select>
-                </label>
-                <label>Alcohol Use:
-                    <select name="alcoholUse" required>
-                        <option value="">Select</option>
-                        <option value="Never">Never</option>
-                        <option value="Occasionally">Occasionally</option>
-                        <option value="Daily">Daily</option>
-                    </select>
-                </label>
-                <label>Recreational Drugs:
-                    <select name="recDrugs" required>
-                        <option value="">Select</option>
-                        <option value="Never">Never</option>
-                        <option value="Past">Past</option>
-                        <option value="Current">Current</option>
-                    </select>
-                </label>
-                <button type="button" onclick="nextPage()">Next</button>
-            </div>
-
-            <!-- Other Pages as per previous structure -->
-
-            <!-- Final Page: Signature and Submit -->
-            <div class="form-page" id="page-final">
-                <h2>Consent and Signature</h2>
-                <label>Signature:
-                    <input type="text" name="signature" required placeholder="Type your name">
-                </label>
-                <p>Date: <span id="timestamp"></span></p>
-                <button type="submit">Submit</button>
-            </div>
-        </form>
-    </div>
-
-    <script>
-        let currentPage = 0;
-        const pages = document.querySelectorAll('.form-page');
-        const progress = document.getElementById('progress');
-
-        // Progress function
-        function updateProgress() {
-            let progressValue = ((currentPage + 1) / pages.length) * 100;
-            progress.style.width = progressValue + '%';
-            progress.textContent = Math.round(progressValue) + '%';
-        }
-
-        // Move to the next page
-        function nextPage() {
-            pages[currentPage].style.display = 'none';
-            currentPage++;
-            pages[currentPage].style.display = 'block';
-            updateProgress();
-        }
-
-        // Toggle Allergy and Med fields
-        function toggleAllergyFields(value) {
-            document.getElementById('allergyFields').style.display = value === 'Yes' ? 'block' : 'none';
-        }
-
-        function toggleMedFields(value) {
-            document.getElementById('medFields').style.display = value === 'Yes' ? 'block' : 'none';
-        }
-
-        // Add more fields function
-        function addField(containerId) {
-            const container = document.getElementById(containerId);
-            const newField = container.firstElementChild.cloneNode(true);
-            container.appendChild(newField);
-        }
-
-        // Set Timestamp
-        document.getElementById('timestamp').textContent = new Date().toLocaleString();
-
-        // Submit form to Google Sheet (Use a backend API in production for HIPAA compliance)
-        function submitForm(event) {
-            event.preventDefault();
-            alert('Form Submitted!'); // Replace with form submission logic
-        }
-
-        // Initial load
-        pages.forEach((page, index) => {
-            if (index !== 0) page.style.display = 'none';
+        // Filter and display matching suggestions
+        const filteredSuggestions = list.filter(item => item.toLowerCase().startsWith(inputValue));
+        filteredSuggestions.forEach(suggestion => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = suggestion;
+            suggestionDiv.onclick = () => {
+                input.value = suggestion; // Set the input value to the clicked suggestion
+                suggestionsDiv.innerHTML = ''; // Clear suggestions
+            };
+            suggestionsDiv.appendChild(suggestionDiv);
         });
-        updateProgress();
-    </script>
+    }
+</script>
+
 </body>
 </html>
